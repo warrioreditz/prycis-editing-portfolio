@@ -1,7 +1,6 @@
 import logo from "./assets/logo.png";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import emailjs from "@emailjs/browser";
 
 
 
@@ -24,17 +23,17 @@ export default function App() {
 
     const interval = setInterval(() => {
 
-      if (edits < 50) {
-        edits++;
+      if (edits < 500) {
+        edits = Math.min(edits + 10, 500);
         setEditCount(edits);
       }
 
-      if (years < 2) {
+      if (years < 3) {
         years++;
         setYearCount(years);
       }
 
-      if (edits >= 50 && years >= 2) {
+      if (edits >= 500 && years >= 3) {
         clearInterval(interval);
       }
 
@@ -65,15 +64,17 @@ export default function App() {
   }, []);
   const sendEmail = (e) => {
     e.preventDefault();
+    const form = e.target;
 
-    emailjs.sendForm(
-      "service_epr7lli",
-      "template_ndwrfjh",
-      e.target,
-      "dQAylIRRM_IVf_-kQ"
-    )
-      .then(() => {
+    fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(new FormData(form)).toString(),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Status ${res.status}`);
         alert("Message sent successfully!");
+        form.reset();
       })
       .catch((error) => {
         console.log(error);
@@ -601,7 +602,7 @@ export default function App() {
 
               {/* Email */}
               <a
-                href="mailto:vptech.growth@gmail.com"
+                href="mailto:pushusingh07@gmail.com"
                 className="flex items-center gap-4 group"
               >
 
@@ -615,7 +616,7 @@ export default function App() {
                   </p>
 
                   <p className="text-white group-hover:text-zinc-300 transition">
-                    vptech.growth@gmail.com
+                    pushusingh07@gmail.com
                   </p>
                 </div>
 
@@ -623,7 +624,7 @@ export default function App() {
 
               {/* Instagram */}
               <a
-                href="https://instagram.com/vptech.growth"
+                href="https://instagram.com/probably.pushpen"
                 target="_blank"
                 className="flex items-center gap-4 group"
               >
@@ -638,7 +639,7 @@ export default function App() {
                   </p>
 
                   <p className="text-white group-hover:text-zinc-300 transition">
-                    @vptech.growth
+                    @probably.pushpen
                   </p>
                 </div>
 
@@ -679,7 +680,21 @@ export default function App() {
           </div>
 
           {/* Form */}
-          <form className="space-y-6" onSubmit={sendEmail}>
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+            className="space-y-6"
+            onSubmit={sendEmail}
+          >
+            <input type="hidden" name="form-name" value="contact" />
+            <input type="hidden" name="subject" value="New portfolio enquiry from %{siteName}" />
+            <p className="hidden">
+              <label>
+                Don’t fill this out: <input name="bot-field" />
+              </label>
+            </p>
 
             {/* Name */}
             <div>
